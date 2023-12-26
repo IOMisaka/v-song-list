@@ -17,47 +17,51 @@ import {
 import type {ColumnsType} from 'antd/lib/table';
 import jData from './assets/data.json';
 import copy from 'copy-to-clipboard';
-import lblImage from './assets/lbl.jpg';
 import avatarImage from './assets/avatar.jpg';
-import pixelImage from './assets/pixel.png';
+import pixelImage from './assets/pixel.gif';
+import sideImage from './assets/bg.webp';
 import './App.css';
 
-const mqtt = require("mqtt/dist/mqtt.min");
+
 
 const {Content} = Layout;
 
-const baseColor = 'pink';
+const baseColor = '#c362d3';
+const numColor = '#e91e63';
+const songColor = 'white';
+const tipColor = 'white';
 const baseFontSize = '1rem';
 const nameFontSize = '2.5rem';
+const numFontSize = '1.8rem';
 
 const colorTable = [
     {
-        price: 7,
-        bgColor: 'rgba(30,136,229,1)',
+        price: 30,
+        bgColor: '#2196F3',
         fColor: 'rgba(255,255,255,1)',
     },
     {
-        price: 14,
-        bgColor: 'rgba(0,229,255,1)',
+        price: 138,
+        bgColor: '#e09443',
         fColor: 'rgba(0,0,0,1)',
     },
     {
-        price: 35,
-        bgColor: 'rgba(29,233,182,1)',
+        price: 1000,
+        bgColor: '#e54d4d',
         fColor: 'rgba(0,0,0,1)',
     },
     {
-        price: 70,
+        price: 2000,
         bgColor: 'rgba(255,202,40,1)',
         fColor: 'rgba(0,0,0,0.87451)',
     },
     {
-        price: 140,
+        price: 3000,
         bgColor: 'rgba(245,124,0,1)',
         fColor: 'rgba(255,255,255,0.87451)',
     },
     {
-        price: 350,
+        price: 4000,
         bgColor: 'rgba(233,30,99,1)',
         fColor: 'rgba(255,255,255,1)',
     },
@@ -119,46 +123,7 @@ let publish = (topic: string, body: string) => {
     }
 };
 
-function start_listen() {
-    if (g_on) {
-        return;
-    }
-    g_on = true;
-    // mqtt服务器免费申请：https://cloud-intl.emqx.com/console/deployments/new
-    let url = process.env.REACT_APP_MQTT_URL || "wss://broker.emqx.io/mqtt";
-    let username = process.env.REACT_APP_USERNAME || "";
-    let password = process.env.REACT_APP_PASSWORD || "";
-    mqClient = mqtt.connect(url, {
-        clientId: mqClientId,
-        username: username,
-        password: password,
-        will: {
-            topic: 'u0/alive/' + mqClientId,
-            payload: '',
-            qos: 0,
-            retain: true,
-        }
-    });
-    mqClient.on('connect', () => {
-        mqClient.subscribe('u0/alive/+');
-        mqClient.subscribe('u0/notice');
-        mqClient.subscribe('u0/broadcast');
-        mqClient.publish('u0/alive/' + mqClientId, JSON.stringify({
-            alive: true,
-            nickname: nickname,
-        }), {qos: 0, retain: true});
-        localStorage.setItem('clientId', mqClientId);
-    });
-    mqClient.on('message', (topic: string, payload: Uint8Array, packet: any) => {
-        try {
-            let t = topic.split('/')[1];
-            if (t in g_callbackMap) {
-                g_callbackMap[t](topic, payload, packet);
-            }
-        } catch (e) {
-        }
-    });
-}
+
 
 function registerCallback(topic: string, callback: Function) {
     g_callbackMap[topic] = callback;
@@ -335,7 +300,7 @@ const App: React.FC = () => {
     registerCallback('notice', on_notice);
     registerCallback('broadcast', on_broadcast);
     try {
-        start_listen();
+        //start_listen();
     } catch (e) {
     }
 
@@ -418,7 +383,7 @@ const App: React.FC = () => {
 
     return (
         <Layout style={{minHeight: '100%', padding: '10px', backgroundColor: '#ffffff7f'}}>
-            <div className={'chat-pannel'}>
+            <div className={'chat-pannel'} style={{display:'none'}}>
                 <div className={'alive-cnt'} onClick={() => {
                     setChatVis((ChatVis + 1) % 3);
                 }}>在线人数：{aliveList.length}</div>
@@ -443,7 +408,7 @@ const App: React.FC = () => {
             <Content>
                 <Row justify={'center'}>
                     <Col
-                        xxl={12} xl={16} lg={18} md={20} sm={22} xs={24} style={{backgroundColor: '#3c3c3cb0'}}>
+                        xxl={12} xl={16} lg={18} md={20} sm={22} xs={24} style={{backgroundColor: '#00000033'}}>
                         <Row justify={'center'} style={{marginTop: 10}}>
                             <div onClick={showDrawer} style={{cursor: "pointer"}}>
                                 <Avatar
@@ -457,41 +422,55 @@ const App: React.FC = () => {
                                 />
                             </div>
                         </Row>
-                        <Row justify={'center'} style={{marginTop: 10}}>
+                        <Row justify={'center'} style={{marginTop: 10,cursor: "pointer"}} onClick={showDrawer}>
                             <span style={{
                                 fontSize: nameFontSize,
                                 color: baseColor,
                                 lineHeight: '1.2em',
                                 textShadow: '2px 2px #0000007f',
                                 fontWeight: "bolder",
-                            }}>幽灵车尔尼桑</span>
+                            }}>温柔小茄</span>
                         </Row>
-                        <Row justify={'center'}>
+                        <Row justify={'center'} style={{marginTop: 10,cursor: "pointer"}} onClick={showDrawer}>
                             <span style={{
-                                fontSize: nameFontSize,
-                                color: baseColor,
+                                fontSize: numFontSize,
+                                color: songColor,
                                 lineHeight: '1.2em',
                                 textShadow: '2px 2px #0000007f',
                                 fontWeight: "bolder",
-                            }}>带来了她的{songNum}首歌~</span>
+                            }}>已经学会</span>
+                            <span style={{
+                                fontSize: numFontSize,
+                                color: numColor,
+                                lineHeight: '1.2em',
+                                textShadow: '2px 2px #0000007f',
+                                fontWeight: "bolder",
+                            }}>{songNum}</span>
+                            <span style={{
+                                fontSize: numFontSize,
+                                color: songColor,
+                                lineHeight: '1.2em',
+                                textShadow: '2px 2px #0000007f',
+                                fontWeight: "bolder",
+                            }}>首歌了~👍</span>
+                        </Row>
+                        <Row justify={'center'} style={{marginTop: 10,cursor:'pointer'}} onClick={showDrawer}>
+                            <span style={{
+                                fontSize: '1rem',
+                                color: tipColor,
+                                lineHeight: '1.2em',
+                                textShadow: '1px 1px black',
+                                fontWeight: "bolder",
+                            }}>~点击头像👆查看更多信息~</span>
                         </Row>
                         <Row justify={'center'}>
                             <span style={{
                                 fontSize: '1rem',
-                                color: "white",
+                                color: tipColor,
                                 lineHeight: '1.2em',
-                                textShadow: '2px 2px black',
+                                textShadow: '1px 1px black',
                                 fontWeight: "bolder",
-                            }}>~点击头像查看主播信息~</span>
-                        </Row>
-                        <Row justify={'center'}>
-                            <span style={{
-                                fontSize: '1rem',
-                                color: "white",
-                                lineHeight: '1.2em',
-                                textShadow: '2px 2px black',
-                                fontWeight: "bolder",
-                            }}>~双击列表即可复制点歌指令~</span>
+                            }}>~双击列表🐧即可复制点歌指令~</span>
                         </Row>
                         <Row style={{margin: '0 10px'}}>{jData?.tags?.map((tag) => {
                             return (
@@ -523,8 +502,8 @@ const App: React.FC = () => {
                                             width: '100%',
                                             height: '100%',
                                             fontSize: baseFontSize,
-                                            backgroundColor: '#d58a98',
-                                            borderColor: 'pink',
+                                            backgroundColor: baseColor,
+                                            borderColor: baseColor,
                                         }}
                                         icon={<SyncOutlined/>} onClick={random_a_song}>随机一个</Button>
                             </Col>
@@ -559,31 +538,26 @@ const App: React.FC = () => {
                         </Row>
                     </Col>
                 </Row>
-                <BackTop style={{height: '49em', width: '23em', fontSize: "0.3rem"}}>
+                <BackTop style={{height: '50em', width: '50em', fontSize: "0.3rem"}}>
                     <div><img src={pixelImage} alt="pixel" style={{width: '100%'}}/></div>
                 </BackTop>
-                <Drawer visible={visable} onClose={closeDrawer} size={"default"}>
+                <Drawer className='bgDrawer' visible={visable} onClose={closeDrawer} size={"default"} >
                     <Row justify={"center"}>
                         <Col span={24} style={{fontSize: '18px', marginBottom: '20px'}}>
-                            <div style={{fontSize: '24px'}}>~幽灵2021置顶更新~</div>
-                            <div>大家好，这里是<span
+                            <div style={{fontSize: '24px'}}>♡置顶♡</div>
+                            <div>你好！我是<span
                                 style={{
-                                    color: "#d58a98",
+                                    color: baseColor,
                                     fontSize: '20px',
                                     fontWeight: "bolder"
-                                }}>幽灵车尔尼桑</span>，一个投稿更新直播随缘的up主
+                                }}>温柔小茄</span>~一个个人歌势！！
                             </div>
-                            <div>喜欢的事是唱歌，在音乐区和生活区反 复 横 跳</div>
-                            <div>【但是看直播很少看唱歌？？？】</div>
-                            <div>谨记偶像（？）的“乐在二次元，行在三次元”，以自己的步调慢慢探索更多的可能性。</div>
-                            <div>很多东西是懂的，但是很任性地不做而已T T</div>
-                            <div>今年的目标是300粉！</div>
-                            <div>希望能跟大家一起成长吧^ ^</div>
-                            <br/>
-                            <div>粉丝基数比较小，推歌、提问、想让我说的台词都可以放进下方提问箱中，我目前都回答啦！↓</div>
-                            <div>（其实差一个台词没有念 嘘——）</div>
-                            <br/>
-                            <div>谢谢大家的关注与喜欢，幽灵会努力赚钱→更多学习→然后变成唱歌更好的人！</div>
+                            <div>关于名字…注册那天看到网上说你的性格+上一顿刚吃过的东西就是名字。</div>
+                            <div>我不太想叫温柔的红烧茄子，所以是温柔小茄啦！</div>
+                            <div>喜欢唱歌！歌单在专栏~偶尔打游戏但是很菜！</div>
+                            <div>会多投翻唱的~大家有想让小茄唱的歌可以发在评论区！</div>
+                            <div>直播时间一般是晚上21：00~</div>
+                            <div>其他时间随机掉落~很高兴遇到你！</div>
                         </Col>
                     </Row>
                     <Row
@@ -594,52 +568,51 @@ const App: React.FC = () => {
                         }}
                     >
                         <Button className={'BtnBiliSpace'}
-                                onClick={() => window.open("https://space.bilibili.com/21693393")}>
+                                title='进入个人空间'
+                                onClick={() => window.open("https://space.bilibili.com/3537114887097069/dynamic")}>
                             <div className={'BtnContent'}>
                                 <img alt={'bilibili'} src={'https://www.bilibili.com/favicon.ico'}></img>
-                                <span>B站个人空间</span>
+                                <span>温柔小茄的动态</span>
                             </div>
                         </Button>
                         <Button className={'BtnBiliLive'}
-                                onClick={() => window.open("https://live.bilibili.com/370468")}>
+                                title='进入直播间'
+                                onClick={() => window.open("https://live.bilibili.com/30526675")}>
                             <div className={'BtnContent'}>
-                                <img alt={'bilibili-live'} src={'https://www.bilibili.com/favicon.ico'}></img>
-                                <span>B站直播间</span>
-                            </div>
-                        </Button>
-                        <Button className={'BtnMusic163'}
-                                onClick={() => window.open("https://music.163.com/#/artist?id=32953961")}>
-                            <div className={'BtnContent'}>
-                                <img alt={'music163'}
-                                     src={'http://p3.music.126.net/tBTNafgjNnTL1KlZMt7lVA==/18885211718935735.jpg'}></img>
-                                <span>网易云音乐</span>
-                            </div>
-                        </Button>
-                        <Button className={'Btn5Sing'}
-                                onClick={() => window.open("http://5sing.kugou.com/50168798/default.html")}>
-                            <div className={'BtnContent'}>
-                                <img alt={'5sing'} src={'http://5sing.kugou.com/favicon.ico'}></img>
-                                <span>5sing-中国原创音乐基地</span>
+                                <img alt={'bilibili直播'} src={'https://www.bilibili.com/favicon.ico'}></img>
+                                <span>BiliBili直播间</span>
                             </div>
                         </Button>
                         <Button className={'BtnBiliLive'}
-                                onClick={() => window.open("https://space.bilibili.com/1277624886")}>
+                                title='观看录播'
+                                onClick={() => window.open("https://space.bilibili.com/62790545")}>
                             <div className={'BtnContent'}>
-                                <img alt={'luboling'} src={lblImage}></img>
-                                <span>录播灵</span>
+                                <img alt={'录播'} src={'https://www.bilibili.com/favicon.ico'}></img>
+                                <span>温柔小茄录播</span>
                             </div>
                         </Button>
-                        <Button className={'BtnAiFaDian'}
-                                onClick={() => window.open("https://afdian.net/@youling0722")}>
+                        <Button className={'BtnQQun'}
+                                title='点击加入'
+                                onClick={() => window.open("http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=TFdnY7oxBZuq5tUCfrGRdE41BE7Comkq&authKey=Z1DRDLulJz6thTAL%2FzIsln2HRSF29dxF%2BXS6HxQo%2F1A3yHMkdR337C%2FKR8KRXsoD&noverify=0&group_code=693720600")}>
                             <div className={'BtnContent'}>
-                                <img alt={'afdian'} src={'https://afdian.net/favicon.ico'}></img>
-                                <span>爱发电</span>
+                                <img alt={'qqqun'} src={'https://qq-web.cdn-go.cn//im.qq.com_new/7bce6d6d/asset/favicon.ico'}></img>
+                                <span>粉丝群693720600</span>
                             </div>
                         </Button>
                         <div style={{
                             color: "rgba(0,0,0,0.3)"
                         }}>
-                            Power&nbsp;by&nbsp;
+                            Made&nbsp;by&nbsp;
+                            <a
+                                href={"https://space.bilibili.com/37141"}
+                                target='_blank'
+                                rel="noreferrer"
+                                style={{
+                                    color: "rgba(0,0,0,0.5)",
+                                    textDecoration: "underline"
+                                }}>御坂
+                            </a><br></br>
+                            Powered&nbsp;by&nbsp;
                             <a
                                 href={"https://github.com/Jeffz615/v-song-list"}
                                 target='_blank'

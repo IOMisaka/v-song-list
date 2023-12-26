@@ -27,11 +27,12 @@ div.ant-table-content > table > tbody.ant-table-tbody > tr.ant-table-row > td.an
 }
 
 div.ant-table-content > table > .ant-table-tbody > tr.ant-table-row:hover > td, .ant-table-tbody > tr > td.ant-table-cell-row-hover {
-    background-color: rgba(255, 192, 203, 0.62);
+    background-color: rgba(239, 134, 243, 0.781);
 }
 
 div.ant-drawer.ant-drawer-open .ant-drawer-content-wrapper {
     max-width: 100%;
+    background-color: transparent;
 }
 
 .InfoButtonWrapper Button {
@@ -40,7 +41,8 @@ div.ant-drawer.ant-drawer-open .ant-drawer-content-wrapper {
     font-size: 18px;
     line-height: 1em;
     border-radius: 20px;
-    border: #000c17 solid 2px;
+    border: #426088a2 solid 2px;
+    background-color: #e0eaf7;
 }
 
 .InfoButtonWrapper Button .BtnContent {
@@ -151,4 +153,15 @@ div.chat-nickname {
 div.chat-content {
     white-space: normal;
     word-break: break-all;
+}
+body .ant-layout{
+    background-color: rgba(240, 248, 255, 0.25) !important;
+}
+.bgDrawer .ant-drawer-content{
+    background-color: rgba(237, 207, 255, 0.8);
+    background-repeat: no-repeat;
+    /*background-image: url('./assets/bg.webp');*/
+}
+.bgDrawer .ant-drawer-header{
+    background-color: transparent;
 }

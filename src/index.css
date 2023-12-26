@@ -14,8 +14,8 @@ body {
   sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: url("./assets/bg.jpg") fixed;
-  background-size: cover;
+  background: url("./assets/bg.webp") fixed;
+  background-size:cover;
 }
 
 code {
