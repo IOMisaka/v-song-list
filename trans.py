@@ -17,16 +17,16 @@ def parse_xlsx(xlsx_file: str):
         if row[1].value is None:
             break
         money = row[0].value and int(row[0].value) or 0
-        song = row[1].value.strip()
-        singer = row[2].value and row[2].value.strip() or ''
-        link = row[3].value and row[3].value.strip() or ''
+        song = str(row[1].value).strip()
+        singer = row[2].value and str(row[2].value).strip() or ''
+        link = row[3].value and (row[3].value).strip() or ''
         tags = [lazy_pinyin(song[:1])[0].upper()[:1]]
-        tags += ['付费'] if money else ['免费']
-        tags += ['歌切'] if link else []
-        tags += row[4].value and [x.upper() for x in row[4].value.replace('，', ',').strip().split(',')] or []
+        tags += ['付费'] if money else ['']
+        tags += ['视频'] if link else []
+        tags += row[4].value and [x.upper() for x in str(row[4].value).replace('，', ',').strip().split(',')] or []
         if "学习中" in tags:
             continue
-        remark = row[5].value and row[5].value.strip() or ''
+        remark = row[5].value and str(row[5].value).strip() or ''
         remark += f' {"".join(lazy_pinyin(song))} {"".join(lazy_pinyin(singer))}'
         remark = remark.strip()
         d.append({
@@ -45,7 +45,7 @@ def parse_xlsx(xlsx_file: str):
 
 
 if __name__ == '__main__':
-    data, allTagsSet = parse_xlsx(sys.argv[1] if len(sys.argv) > 1 else '幽灵歌单整理.xlsx')
+    data, allTagsSet = parse_xlsx(sys.argv[1] if len(sys.argv) > 1 else '小茄歌单.xlsx')
     allTagsList = list(allTagsSet)
     allTagsList.sort()
     jdata = json.dumps({'data': data, 'tags': allTagsList}, separators=(',', ':'))
