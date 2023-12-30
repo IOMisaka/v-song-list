@@ -27,7 +27,7 @@ import './App.css';
 const {Content} = Layout;
 
 const baseColor = '#c362d3';
-const numColor = '#e91e63';
+const numColor = '#38fff8';
 const songColor = 'white';
 const tipColor = 'white';
 const baseFontSize = '1rem';
@@ -142,7 +142,7 @@ const App: React.FC = () => {
     const [MyNickName, setNick] = useState(nickname);
     const [ChatVis, setChatVis] = useState<number>(0);
     const bottomLine = useRef<HTMLDivElement>(null);
-
+    const totalNum = jData?.data?.length;
     const scrollToBottom = () => {
         if (bottomLine && bottomLine.current) {
             bottomLine.current.scrollIntoView({behavior: 'auto'});
@@ -427,7 +427,7 @@ const App: React.FC = () => {
                                 fontSize: nameFontSize,
                                 color: baseColor,
                                 lineHeight: '1.2em',
-                                textShadow: '2px 2px #0000007f',
+                                textShadow: '1px 1px #0000007f',
                                 fontWeight: "bolder",
                             }}>温柔小茄</span>
                         </Row>
@@ -436,23 +436,23 @@ const App: React.FC = () => {
                                 fontSize: numFontSize,
                                 color: songColor,
                                 lineHeight: '1.2em',
-                                textShadow: '2px 2px #0000007f',
+                                textShadow: '1px 1px #0000007f',
                                 fontWeight: "bolder",
-                            }}>已经学会</span>
+                            }}>为你带来了</span>
                             <span style={{
                                 fontSize: numFontSize,
                                 color: numColor,
                                 lineHeight: '1.2em',
-                                textShadow: '2px 2px #0000007f',
+                                textShadow: '1px 1px #ffffff7f',
                                 fontWeight: "bolder",
-                            }}>{songNum}</span>
+                            }}>{songNum}/{totalNum}</span>
                             <span style={{
                                 fontSize: numFontSize,
                                 color: songColor,
                                 lineHeight: '1.2em',
-                                textShadow: '2px 2px #0000007f',
+                                textShadow: '1px 1px #0000007f',
                                 fontWeight: "bolder",
-                            }}>首歌了~👍</span>
+                            }}>首歌👍</span>
                         </Row>
                         <Row justify={'center'} style={{marginTop: 10,cursor:'pointer'}} onClick={showDrawer}>
                             <span style={{
