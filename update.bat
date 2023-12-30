@@ -1,1 +1,2 @@
-git subtree push --prefix build origin gh-pages 
+venv\Scripts\python.exe trans.py
+npm run build

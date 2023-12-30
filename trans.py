@@ -6,7 +6,15 @@ import sys
 import os
 import hashlib
 
-
+def parseInt(s):
+    try:
+        if s is not None:
+            if s.strip():
+                return int(s.strip())
+        return 0
+    except:
+        print("failed:",s)
+        return 0
 def parse_xlsx(xlsx_file: str):
     d = []
     wb = load_workbook(xlsx_file)
@@ -16,7 +24,7 @@ def parse_xlsx(xlsx_file: str):
     for row in ws[f'2:{ws.max_row}']:
         if row[1].value is None:
             break
-        money = row[0].value and int(row[0].value) or 0
+        money = parseInt(row[0].value)
         song = str(row[1].value).strip()
         singer = row[2].value and str(row[2].value).strip() or ''
         link = row[3].value and (row[3].value).strip() or ''
@@ -48,7 +56,7 @@ if __name__ == '__main__':
     data, allTagsSet = parse_xlsx(sys.argv[1] if len(sys.argv) > 1 else '小茄歌单.xlsx')
     allTagsList = list(allTagsSet)
     allTagsList.sort()
-    jdata = json.dumps({'data': data, 'tags': allTagsList}, separators=(',', ':'))
+    jdata = json.dumps({'data': data, 'tags': allTagsList},ensure_ascii=False, separators=(',', ':'))
     with open(os.path.join('src', 'assets', 'data.json'), 'w', encoding='utf-8') as f:
         f.write(jdata)
 #     print(json.dumps({'data': data}, indent=4))
