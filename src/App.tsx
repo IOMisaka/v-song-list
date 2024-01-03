@@ -445,7 +445,7 @@ const App: React.FC = () => {
                                 lineHeight: '1.2em',
                                 textShadow: '1px 1px #ffffff7f',
                                 fontWeight: "bolder",
-                            }}>{songNum}/{totalNum}</span>
+                            }}>{songNum}</span>
                             <span style={{
                                 fontSize: numFontSize,
                                 color: songColor,
