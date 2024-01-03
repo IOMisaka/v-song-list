@@ -29,9 +29,9 @@ def parse_xlsx(xlsx_file: str):
         singer = row[2].value and str(row[2].value).strip() or ''
         link = row[3].value and (row[3].value).strip() or ''
         tags = [lazy_pinyin(song[:1])[0].upper()[:1]]
-        tags += ['付费'] if money else ['']
+        tags += ['付费'] if money else []
         tags += ['视频'] if link else []
-        tags += row[4].value and [x.upper() for x in str(row[4].value).replace('，', ',').strip().split(',')] or []
+        tags += row[4].value and row[4].value.strip() and [x.upper() for x in str(row[4].value).replace('，', ',').strip().split(',')] or []
         if "学习中" in tags:
             continue
         remark = row[5].value and str(row[5].value).strip() or ''
