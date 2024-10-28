@@ -1,5 +1,5 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {SyncOutlined, YoutubeOutlined, SearchOutlined} from '@ant-design/icons';
+import React, { useState, useEffect, useRef } from 'react';
+import { SyncOutlined, YoutubeOutlined, SearchOutlined } from '@ant-design/icons';
 import {
     Layout,
     Avatar,
@@ -14,7 +14,7 @@ import {
     Drawer,
     notification
 } from 'antd';
-import type {ColumnsType} from 'antd/lib/table';
+import type { ColumnsType } from 'antd/lib/table';
 import jData from './assets/data.json';
 import copy from 'copy-to-clipboard';
 import avatarImage from './assets/avatar.jpg';
@@ -24,7 +24,7 @@ import './App.css';
 
 
 
-const {Content} = Layout;
+const { Content } = Layout;
 
 const baseColor = '#c362d3';
 const numColor = '#38fff8';
@@ -71,10 +71,23 @@ const colorTable = [
         fColor: 'rgba(255,255,255,1)',
     },
 ]
+let colorDict = new Map<string, any>();
+colorDict.set('舰长', {
+    bgColor: '#4471e7',
+    fColor: 'rgba(255,255,255,1)'
+})
+colorDict.set('提督', {
+    bgColor: '#915dde',
+    fColor: 'rgba(255,255,255,1)'
+})
+colorDict.set('总督', {
+    bgColor: '#b8485f',
+    fColor: 'rgba(255,255,255,1)'
+})
 
 interface IDataType {
     key: number;
-    money: number;
+    money: string;
     song: string;
     link: string;
     singer: string;
@@ -96,7 +109,7 @@ interface IMqNormalMsg {
 
 const TdCell = (props: any) => {
     // onMouseEnter, onMouseLeave在数据量多的时候，会严重阻塞表格单元格渲染，严重影响性能
-    const {onMouseEnter, onMouseLeave, ...restProps} = props;
+    const { onMouseEnter, onMouseLeave, ...restProps } = props;
     return <td {...restProps} />;
 };
 
@@ -128,7 +141,6 @@ let publish = (topic: string, body: string) => {
 function registerCallback(topic: string, callback: Function) {
     g_callbackMap[topic] = callback;
 }
-
 const decoder = new TextDecoder('utf-8');
 
 const App: React.FC = () => {
@@ -145,7 +157,7 @@ const App: React.FC = () => {
     const totalNum = jData?.data?.length;
     const scrollToBottom = () => {
         if (bottomLine && bottomLine.current) {
-            bottomLine.current.scrollIntoView({behavior: 'auto'});
+            bottomLine.current.scrollIntoView({ behavior: 'auto' });
         }
     }
 
@@ -160,10 +172,7 @@ const App: React.FC = () => {
     const random_a_song = () => {
         let record: IDataType = data[Math.floor(Math.random() * data.length)];
         copy('点歌 ' + record.song);
-        if (record.money !== 0)
-            message.success('"点歌 ' + record.song + '"成功复制到剪贴板，快去直播间打' + record.money + '米点歌吧~');
-        else
-            message.success('"点歌 ' + record.song + '"成功复制到剪贴板，快去直播间点歌吧~');
+        message.success('"点歌 ' + record.song + '"成功复制到剪贴板，快去直播间点歌吧~');
     }
 
     const columns: ColumnsType<IDataType> = [
@@ -171,28 +180,24 @@ const App: React.FC = () => {
             title: '',
             dataIndex: 'money',
             width: 50,
-            render: (money: number) => {
-                let bgColor = 'rgba(255,255,255, 1)';
-                let fColor = 'rgba(0,0,0,1)';
-                for (const color of colorTable) {
-                    if (money >= color.price) {
-                        bgColor = color.bgColor;
-                        fColor = color.fColor;
-                    }
+            render: (money: string) => {
+                let bgColor = '#73bd67';
+                let fColor = 'rgba(255，255，255,1)';
+                if (money === '')return (<></>)
+                if (colorDict.has(money)) {
+                    let colorObj = colorDict.get(money);
+                    bgColor = colorObj?.bgColor;
+                    fColor = colorObj?.fColor
                 }
-                if (money > 0)
-                    return (
-                        <Tag color={bgColor} key={money} style={{color: fColor, margin: 0, cursor: "pointer"}}
-                             onClick={() => {
-                                 setSearchValue(searchValue + " !M:" + money);
-                             }}>
-                            ¥{money}
-                        </Tag>
-                    );
-                else
-                    return (
-                        <></>
-                    );
+                return (
+                    <Tag color={bgColor} key={money} style={{ color: fColor, margin: 0, cursor: "pointer" }}
+                        onClick={() => {
+                            setSearchValue(searchValue + " !M:" + money);
+                        }}>
+                        {money}
+                    </Tag>
+                );
+                
             },
         },
         {
@@ -203,7 +208,7 @@ const App: React.FC = () => {
                 if (link.length > 0)
                     return (
                         <a href={link} target='_blank' rel="noreferrer"><Button shape="circle"
-                                                                                icon={<YoutubeOutlined/>}/></a>
+                            icon={<YoutubeOutlined />} /></a>
                     );
                 else
                     return (<></>);
@@ -225,16 +230,16 @@ const App: React.FC = () => {
             dataIndex: 'tags',
             render: (tags: string[]) => (
                 <span>
-            {tags.map(tag => {
-                return (
-                    <Tag color={'cyan'} key={tag} onClick={() => {
-                        setSearchValue(searchValue + " !T:" + tag);
-                    }} style={{cursor: "pointer"}}>
-                        {tag.toUpperCase()}
-                    </Tag>
-                );
-            })}
-            </span>
+                    {tags.map(tag => {
+                        return (
+                            <Tag color={'cyan'} key={tag} onClick={() => {
+                                setSearchValue(searchValue + " !T:" + tag);
+                            }} style={{ cursor: "pointer" }}>
+                                {tag.toUpperCase()}
+                            </Tag>
+                        );
+                    })}
+                </span>
             ),
         },
     ];
@@ -291,7 +296,7 @@ const App: React.FC = () => {
                 console.log(`消息：[${nickname}] => ${msg}`);
                 setMsg(current => [...current.filter(x => {
                     return x.nickname !== nickname || x.msg !== msg || x.ts !== ts;
-                }), {nickname: nickname, msg: msg, ts: ts}]);
+                }), { nickname: nickname, msg: msg, ts: ts }]);
             }
         }
     }
@@ -315,7 +320,7 @@ const App: React.FC = () => {
         let msg = prompt("请输入你要发送的消息", '');
         if (msg) {
             if (msg.length > 0 && msg.length <= 1024) {
-                publish('u0/broadcast', JSON.stringify({msg: msg, nickname: MyNickName, ts: new Date().getTime()}));
+                publish('u0/broadcast', JSON.stringify({ msg: msg, nickname: MyNickName, ts: new Date().getTime() }));
             } else {
                 message.warn('发送文本字符数量需要大于0小于等于1024');
             }
@@ -356,13 +361,14 @@ const App: React.FC = () => {
                                     continue;
                                 }
                                 if (lword.startsWith("!M:")) {
-                                    if (!(item?.money === parseInt(lword.slice(3))))
+                                    if (!(item?.money?.indexOf(lword.slice(3)) !== -1))
                                         return false;
                                     continue;
                                 }
                                 if (!(item?.song?.toUpperCase().indexOf(lword) !== -1 ||
                                     item?.singer?.toUpperCase().indexOf(lword) !== -1 ||
-                                    item?.remark?.toUpperCase().indexOf(lword) !== -1))
+                                    item?.remark?.toUpperCase().indexOf(lword) !== -1
+                                ))
                                     return false;
                             }
                             return true;
@@ -382,8 +388,8 @@ const App: React.FC = () => {
     }, [data]);
 
     return (
-        <Layout style={{minHeight: '100%', padding: '10px', backgroundColor: '#ffffff7f'}}>
-            <div className={'chat-pannel'} style={{display:'none'}}>
+        <Layout style={{ minHeight: '100%', padding: '10px', backgroundColor: '#ffffff7f' }}>
+            <div className={'chat-pannel'} style={{ display: 'none' }}>
                 <div className={'alive-cnt'} onClick={() => {
                     setChatVis((ChatVis + 1) % 3);
                 }}>在线人数：{aliveList.length}</div>
@@ -408,12 +414,12 @@ const App: React.FC = () => {
             <Content>
                 <Row justify={'center'}>
                     <Col
-                        xxl={12} xl={16} lg={18} md={20} sm={22} xs={24} style={{backgroundColor: '#00000033'}}>
-                        <Row justify={'center'} style={{marginTop: 10}}>
-                            <div onClick={showDrawer} style={{cursor: "pointer"}}>
+                        xxl={12} xl={16} lg={18} md={20} sm={22} xs={24} style={{ backgroundColor: '#00000033' }}>
+                        <Row justify={'center'} style={{ marginTop: 10 }}>
+                            <div onClick={showDrawer} style={{ cursor: "pointer" }}>
                                 <Avatar
                                     className={'bili-avatar'}
-                                    size={{xs: 100, sm: 150, md: 180, lg: 200, xl: 220, xxl: 250}}
+                                    size={{ xs: 100, sm: 150, md: 180, lg: 200, xl: 220, xxl: 250 }}
                                     src={avatarImage}
                                     style={{
                                         border: '3px solid ' + baseColor,
@@ -422,7 +428,7 @@ const App: React.FC = () => {
                                 />
                             </div>
                         </Row>
-                        <Row justify={'center'} style={{marginTop: 10,cursor: "pointer"}} onClick={showDrawer}>
+                        <Row justify={'center'} style={{ marginTop: 10, cursor: "pointer" }} onClick={showDrawer}>
                             <span style={{
                                 fontSize: nameFontSize,
                                 color: baseColor,
@@ -431,7 +437,7 @@ const App: React.FC = () => {
                                 fontWeight: "bolder",
                             }}>温柔小茄</span>
                         </Row>
-                        <Row justify={'center'} style={{marginTop: 10,cursor: "pointer"}} onClick={showDrawer}>
+                        <Row justify={'center'} style={{ marginTop: 10, cursor: "pointer" }} onClick={showDrawer}>
                             <span style={{
                                 fontSize: numFontSize,
                                 color: songColor,
@@ -454,7 +460,7 @@ const App: React.FC = () => {
                                 fontWeight: "bolder",
                             }}>首歌👍</span>
                         </Row>
-                        <Row justify={'center'} style={{marginTop: 10,cursor:'pointer'}} onClick={showDrawer}>
+                        <Row justify={'center'} style={{ marginTop: 10, cursor: 'pointer' }} onClick={showDrawer}>
                             <span style={{
                                 fontSize: '1rem',
                                 color: tipColor,
@@ -472,45 +478,45 @@ const App: React.FC = () => {
                                 fontWeight: "bolder",
                             }}>~双击列表🐧即可复制点歌指令~</span>
                         </Row>
-                        <Row style={{margin: '0 10px'}}>{jData?.tags?.map((tag) => {
+                        <Row style={{ margin: '0 10px' }}>{jData?.tags?.map((tag) => {
                             return (
                                 <Tag color={'cyan'} key={tag} onClick={() => {
                                     setSearchValue(searchValue + " !T:" + tag);
-                                }} style={{cursor: "pointer", margin: '5px'}}>
+                                }} style={{ cursor: "pointer", margin: '5px' }}>
                                     {tag.toUpperCase()}
                                 </Tag>
                             );
                         })}</Row>
-                        <Row style={{padding: 10}}>
-                            <Col span={15} style={{paddingRight: 10}}>
+                        <Row style={{ padding: 10 }}>
+                            <Col span={15} style={{ paddingRight: 10 }}>
                                 <Input placeholder={'输入关键字看看有没有你想听的？'}
-                                       style={{
-                                           fontSize: baseFontSize,
-                                           borderRadius: baseFontSize,
-                                       }}
-                                       allowClear
-                                       prefix={<SearchOutlined/>}
-                                       value={searchValue}
-                                       onChange={e => {
-                                           setSearchValue(e.target.value || '')
-                                       }}
+                                    style={{
+                                        fontSize: baseFontSize,
+                                        borderRadius: baseFontSize,
+                                    }}
+                                    allowClear
+                                    prefix={<SearchOutlined />}
+                                    value={searchValue}
+                                    onChange={e => {
+                                        setSearchValue(e.target.value || '')
+                                    }}
                                 ></Input>
                             </Col>
                             <Col span={9}>
                                 <Button type="primary" shape="round"
-                                        style={{
-                                            width: '100%',
-                                            height: '100%',
-                                            fontSize: baseFontSize,
-                                            backgroundColor: baseColor,
-                                            borderColor: baseColor,
-                                        }}
-                                        icon={<SyncOutlined/>} onClick={random_a_song}>随机一个</Button>
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        fontSize: baseFontSize,
+                                        backgroundColor: baseColor,
+                                        borderColor: baseColor,
+                                    }}
+                                    icon={<SyncOutlined />} onClick={random_a_song}>随机一个</Button>
                             </Col>
                         </Row>
-                        <Row style={{padding: '0 10px 10px 10px'}}>
-                            <div className={'my-table-wrapper'} style={{width: '100%', overflowX: "auto"}}>
-                                <div style={{minWidth: '600px', width: '100%'}}>
+                        <Row style={{ padding: '0 10px 10px 10px' }}>
+                            <div className={'my-table-wrapper'} style={{ width: '100%', overflowX: "auto" }}>
+                                <div style={{ minWidth: '600px', width: '100%' }}>
                                     <Table
                                         dataSource={data}
                                         columns={columns}
@@ -519,18 +525,15 @@ const App: React.FC = () => {
                                             return {
                                                 onDoubleClick: () => {
                                                     copy('点歌 ' + record.song);
-                                                    if (record.money !== 0)
-                                                        message.success('"点歌 ' + record.song + '"成功复制到剪贴板，快去直播间打 ' + record.money + ' 米点歌吧~');
-                                                    else
-                                                        message.success('"点歌 ' + record.song + '"成功复制到剪贴板，快去直播间点歌吧~');
+                                                    message.success('"点歌 ' + record.song + '"成功复制到剪贴板，快去直播间点歌吧~');
                                                 },
                                             };
                                         }}
                                         size={"small"}
-                                        style={{width: '100%'}}
+                                        style={{ width: '100%' }}
                                         rowKey={record => record.key}
                                         components={{
-                                            body: {cell: TdCell},
+                                            body: { cell: TdCell },
                                         }}
                                     />
                                 </div>
@@ -538,13 +541,13 @@ const App: React.FC = () => {
                         </Row>
                     </Col>
                 </Row>
-                <BackTop style={{height: '50em', width: '50em', fontSize: "0.3rem"}}>
-                    <div><img src={pixelImage} alt="pixel" style={{width: '100%'}}/></div>
+                <BackTop style={{ height: '50em', width: '50em', fontSize: "0.3rem" }}>
+                    <div><img src={pixelImage} alt="pixel" style={{ width: '100%' }} /></div>
                 </BackTop>
                 <Drawer className='bgDrawer' visible={visable} onClose={closeDrawer} size={"default"} >
                     <Row justify={"center"}>
-                        <Col span={24} style={{fontSize: '18px', marginBottom: '20px'}}>
-                            <div style={{fontSize: '24px'}}>♡置顶♡</div>
+                        <Col span={24} style={{ fontSize: '18px', marginBottom: '20px' }}>
+                            <div style={{ fontSize: '24px' }}>♡置顶♡</div>
                             <div>你好！我是<span
                                 style={{
                                     color: baseColor,
@@ -568,32 +571,32 @@ const App: React.FC = () => {
                         }}
                     >
                         <Button className={'BtnBiliSpace'}
-                                title='进入个人空间'
-                                onClick={() => window.open("https://space.bilibili.com/3537114887097069/dynamic")}>
+                            title='进入个人空间'
+                            onClick={() => window.open("https://space.bilibili.com/3537114887097069/dynamic")}>
                             <div className={'BtnContent'}>
                                 <img alt={'bilibili'} src={'https://www.bilibili.com/favicon.ico'}></img>
                                 <span>温柔小茄的动态</span>
                             </div>
                         </Button>
                         <Button className={'BtnBiliLive'}
-                                title='进入直播间'
-                                onClick={() => window.open("https://live.bilibili.com/30526675")}>
+                            title='进入直播间'
+                            onClick={() => window.open("https://live.bilibili.com/30526675")}>
                             <div className={'BtnContent'}>
                                 <img alt={'bilibili直播'} src={'https://www.bilibili.com/favicon.ico'}></img>
                                 <span>BiliBili直播间</span>
                             </div>
                         </Button>
                         <Button className={'BtnBiliLive'}
-                                title='观看录播'
-                                onClick={() => window.open("https://space.bilibili.com/62790545")}>
+                            title='观看录播'
+                            onClick={() => window.open("https://space.bilibili.com/62790545")}>
                             <div className={'BtnContent'}>
                                 <img alt={'录播'} src={'https://www.bilibili.com/favicon.ico'}></img>
                                 <span>温柔小茄录播</span>
                             </div>
                         </Button>
                         <Button className={'BtnQQun'}
-                                title='点击加入'
-                                onClick={() => window.open("http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=TFdnY7oxBZuq5tUCfrGRdE41BE7Comkq&authKey=Z1DRDLulJz6thTAL%2FzIsln2HRSF29dxF%2BXS6HxQo%2F1A3yHMkdR337C%2FKR8KRXsoD&noverify=0&group_code=693720600")}>
+                            title='点击加入'
+                            onClick={() => window.open("http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=TFdnY7oxBZuq5tUCfrGRdE41BE7Comkq&authKey=Z1DRDLulJz6thTAL%2FzIsln2HRSF29dxF%2BXS6HxQo%2F1A3yHMkdR337C%2FKR8KRXsoD&noverify=0&group_code=693720600")}>
                             <div className={'BtnContent'}>
                                 <img alt={'qqqun'} src={'https://qq-web.cdn-go.cn//im.qq.com_new/7bce6d6d/asset/favicon.ico'}></img>
                                 <span>粉丝群693720600</span>
