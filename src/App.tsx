@@ -172,7 +172,9 @@ const App: React.FC = () => {
     const random_a_song = () => {
         let record: IDataType = data[Math.floor(Math.random() * data.length)];
         copy('点歌 ' + record.song);
-        message.success('"点歌 ' + record.song + '"成功复制到剪贴板，快去直播间点歌吧~');
+        let pre="";
+        if(record.money!='')pre="需要【"+record.money+"】";
+        message.success(pre+'"点歌 ' + record.song + '"成功复制到剪贴板，快去直播间点歌吧~');
     }
 
     const columns: ColumnsType<IDataType> = [
@@ -525,7 +527,9 @@ const App: React.FC = () => {
                                             return {
                                                 onDoubleClick: () => {
                                                     copy('点歌 ' + record.song);
-                                                    message.success('"点歌 ' + record.song + '"成功复制到剪贴板，快去直播间点歌吧~');
+                                                    let pre="";
+                                                    if(record.money!='')pre="需要【"+record.money+"】";
+                                                    message.success(pre+'"点歌 ' + record.song + '"成功复制到剪贴板，快去直播间点歌吧~');
                                                 },
                                             };
                                         }}
