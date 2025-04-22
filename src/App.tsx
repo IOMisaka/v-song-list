@@ -19,7 +19,7 @@ import jData from './assets/data.json';
 import copy from 'copy-to-clipboard';
 import avatarImage from './assets/avatar.jpg';
 import pixelImage from './assets/pixel.gif';
-import sideImage from './assets/bg.webp';
+import sideImage from './assets/bg.avif';
 import './App.css';
 
 
